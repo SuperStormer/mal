@@ -61,12 +61,11 @@ def main():
 		try:
 			inp = input("user> ")
 			print(rep(inp))
-		except EOFError:
+		except (EOFError, KeyboardInterrupt):
 			print()
 			break
 		except Exception as e:
-			e_type, e_value, _ = sys.exc_info()
-			print(f"{e_type.__name__}: {e_value}", file=sys.stderr)
+			print(f"{e.__class__.__name__}: {e}", file=sys.stderr)
 
 if __name__ == "__main__":
 	main()
