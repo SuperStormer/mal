@@ -1,5 +1,7 @@
 from mal_types import Symbol,Vector
 
+class ReaderError(Exception):
+	pass
 
 class Reader():
 	def __init__(self, inp: str):
@@ -33,7 +35,7 @@ class Reader():
 							chars += x
 							i += 1
 					except IndexError:
-						raise SyntaxError("unbalanced double quote")
+						raise ReaderError("unbalanced double quote")
 					i+=1			
 					tokens.append('"' + chars + '"')
 				elif x == ";":
@@ -66,7 +68,7 @@ class Reader():
 			while self.peek() != end_char:
 				lst.append(self.read_form())
 		except IndexError:
-			raise SyntaxError("unbalanced parentheses")
+			raise ReaderError("unbalanced parentheses")
 		self.pos += 1
 		return type_(lst)
 	def read_atom(self):
@@ -84,3 +86,5 @@ class Reader():
 	def next(self):
 		self.pos += 1
 		return self.tokens[self.pos - 1]
+def read_str(inp:str):
+	return Reader(inp).read_form()

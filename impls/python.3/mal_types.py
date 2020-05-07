@@ -17,5 +17,8 @@ class Vector():
 	def __iter__(self):
 		return iter(self.lst)
 	
+	def __getitem__(self, key):
+		return self.lst[key]
+	
 	def __repr__(self):
 		return "Vector(" + repr(self.lst) + ")"

@@ -4,7 +4,7 @@ import sys
 import operator
 from mal_types import Symbol, Vector
 from pretty_print import pretty_print
-from reader import Reader
+from reader import read_str
 from env import Env
 global_env = Env(
 	None, {
@@ -18,7 +18,7 @@ global_env = Env(
 )
 
 def read(inp: str):
-	return Reader(inp).read_form()
+	return read_str(inp)
 
 def eval_(ast, env):
 	if isinstance(ast, list):
@@ -30,7 +30,9 @@ def eval_(ast, env):
 				return val
 			elif ast[0] == Symbol("let*"):
 				env = Env(env)
-				#TODO
+				for key, value in zip(ast[1][::2], ast[1][1::2]):
+					env[key] = eval_(value, env)
+				return eval_(ast[2], env)
 			else:
 				return env[ast[0]](*eval_ast(ast[1:], env))
 		else:
@@ -64,7 +66,7 @@ def main():
 			break
 		except Exception as e:
 			e_type, e_value, _ = sys.exc_info()
-			print(e_type.__name__ + ":", e_value, file=sys.stderr)
+			print(f"{e_type.__name__}: {e_value}", file=sys.stderr)
 
 if __name__ == "__main__":
 	main()
