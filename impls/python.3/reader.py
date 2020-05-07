@@ -1,7 +1,6 @@
-import re
-from mal_types import Symbol
-class ReaderError(Exception):
-	pass
+from mal_types import Symbol,Vector
+
+
 class Reader():
 	def __init__(self, inp: str):
 		self.tokens = self.tokenize(inp)
@@ -34,7 +33,7 @@ class Reader():
 							chars += x
 							i += 1
 					except IndexError:
-						raise ReaderError("unbalanced double quote")
+						raise SyntaxError("unbalanced double quote")
 					i+=1			
 					tokens.append('"' + chars + '"')
 				elif x == ";":
@@ -52,22 +51,24 @@ class Reader():
 	
 	def read_form(self):
 		if not self.tokens:
-			return ...
+			return None
 		x = self.peek()
 		if x=="(":
-			return self.read_list()
+			return self.read_list(")",list)
+		elif x=="[":
+			return self.read_list("]",Vector)
 		else:
 			return self.read_atom()
-	def read_list(self):
+	def read_list(self,end_char,type_):
 		self.pos += 1
 		lst = []
 		try:
-			while self.peek() != ")":
+			while self.peek() != end_char:
 				lst.append(self.read_form())
 		except IndexError:
-			raise ReaderError("unbalanced parentheses")
+			raise SyntaxError("unbalanced parentheses")
 		self.pos += 1
-		return lst
+		return type_(lst)
 	def read_atom(self):
 		x = self.next()
 		try:

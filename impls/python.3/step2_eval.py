@@ -2,9 +2,9 @@
 import readline  # pylint: disable=unused-import
 import sys
 import operator
-from mal_types import Symbol
+from mal_types import Symbol, Vector
 from pretty_print import pretty_print
-from reader import Reader, ReaderError
+from reader import Reader
 environ = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.floordiv}
 
 def read(inp: str):
@@ -24,6 +24,8 @@ def eval_ast(ast):
 		return environ[ast.name]
 	elif isinstance(ast, list):
 		return list(map(eval_, ast))
+	elif isinstance(ast, Vector):
+		return Vector(map(eval_, ast))
 	else:
 		return ast
 
