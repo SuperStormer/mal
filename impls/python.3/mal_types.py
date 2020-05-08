@@ -20,5 +20,11 @@ class Vector():
 	def __getitem__(self, key):
 		return self.lst[key]
 	
+	def __setitem__(self, key, val):
+		self.lst[key] = val
+	
+	def __len__(self):
+		return len(self.lst)
+	
 	def __repr__(self):
 		return "Vector(" + repr(self.lst) + ")"

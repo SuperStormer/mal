@@ -11,9 +11,7 @@ global_env = Env(
 	"+": operator.add,
 	"-": operator.sub,
 	"*": operator.mul,
-	"/": operator.floordiv,
-	"def!": None,
-	"let*": None
+	"/": operator.floordiv
 	}
 )
 
@@ -23,7 +21,6 @@ def read(inp: str):
 def eval_(ast, env):
 	if isinstance(ast, list):
 		if ast:
-			#evaled_list = eval_ast(ast, env)
 			if ast[0] == Symbol("def!"):
 				val = eval_(ast[2], env)
 				env[ast[1]] = val

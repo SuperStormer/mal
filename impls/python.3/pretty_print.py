@@ -1,14 +1,19 @@
 from mal_types import Symbol, Vector
 
-def pretty_print(obj):
+def pretty_print(obj, print_readably):
 	if obj is None:
-		return ""
+		return "nil"
 	elif isinstance(obj, Symbol):
 		return obj.name
 	elif isinstance(obj, list):
-		return "(" + " ".join(map(pretty_print, obj)) + ")"
+		return "(" + " ".join(pretty_print(el, print_readably) for el in obj) + ")"
 	elif isinstance(obj, Vector):
-		return "[" + " ".join(map(pretty_print, obj)) + "]"
+		return "[" + " ".join(pretty_print(el, print_readably) for el in obj) + "]"
 	elif isinstance(obj, str):
-		return '"%s"' % repr(obj)[1:-1].replace('"', r'\"')
+		if print_readably:
+			return '"%s"' % obj.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
+		else:
+			return str(obj)
+	elif isinstance(obj, bool):
+		return str(obj).lower()
 	return str(obj)

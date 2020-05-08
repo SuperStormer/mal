@@ -22,7 +22,7 @@ class Reader():
 				elif x in "[]{}()'`~^@":
 					tokens.append(x)
 					i += 1
-				elif x == '"':
+				elif x == '"': #string
 					i += 1
 					chars = ""
 					escaped = False
@@ -36,11 +36,11 @@ class Reader():
 							i += 1
 					except IndexError:
 						raise ReaderError("unbalanced double quote")
-					i+=1			
+					i+=1
 					tokens.append('"' + chars + '"')
 				elif x == ";":
 					break
-				else:
+				else: #keywords
 					chars = ""
 					try:
 						while (x := line[i]) not in "[]{}('\"`,;)" and not x.isspace():
@@ -77,8 +77,27 @@ class Reader():
 			return int(x)
 		except ValueError:
 			pass
-		if x[0] == '"':
-			return x[1:-1].replace('\\"','"').replace('\\n','\n').replace('\\\\','\\')
+		if x[0] == '"': # strings
+			string = ""
+			escaped = False
+			for c in x[1:-1]:
+				if escaped:
+					if c == "n":
+						string += "\n"
+					else:
+						string += c
+					escaped = False
+				elif c == "\\":
+					escaped = True
+				else:
+					string += c
+			return string
+		if x == "true":
+			return True
+		if x== "false":
+			return False
+		if x=="nil":
+			return None
 		return Symbol(x)
 
 	def peek(self):

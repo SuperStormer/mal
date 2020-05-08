@@ -7,15 +7,18 @@ class Env():
 	def __init__(self, outer, data=None):
 		self.outer = outer
 		if data:
-			self.data = {Symbol(k): v for k, v in data.items()}
+			self.data = data
 		else:
 			self.data = {}
 	
 	def __getitem__(self, key):
 		try:
-			return self.data.get(key) or self.outer[key]
-		except TypeError:
-			raise EnvError(f"{key.name!r} not found in environment")
+			return self.data[key]
+		except KeyError:
+			try:
+				return self.outer[key]
+			except TypeError:
+				raise EnvError(f"{key.name!r} not found in environment")
 	
 	def __setitem__(self, key, value):
 		self.data[key] = value
