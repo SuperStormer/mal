@@ -1,6 +1,6 @@
 from mal_types import Symbol, Vector
 
-def pretty_print(obj, print_readably):
+def pretty_print(obj, print_readably=True):
 	if obj is None:
 		return "nil"
 	elif isinstance(obj, Symbol):

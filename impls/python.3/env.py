@@ -1,5 +1,3 @@
-from mal_types import Symbol
-
 class EnvError(KeyError):
 	__str__ = Exception.__str__
 

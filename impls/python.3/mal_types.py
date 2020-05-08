@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import itertools
+from env import Env
 
 @dataclass(frozen=True)
 class Symbol():
@@ -28,3 +30,31 @@ class Vector():
 	
 	def __repr__(self):
 		return "Vector(" + repr(self.lst) + ")"
+
+class Function():
+	def __init__(self, body, params, env, eval_):
+		self.body = body
+		self.params = params
+		self.env = env
+		self.eval_ = eval_
+	
+	def bind_args(self, args):
+		binds = itertools.zip_longest(self.params, args)
+		data = {}
+		for bind, expr in binds:
+			if bind == Symbol("&"):  # varargs
+				key, val = next(binds)
+				if val:
+					data[key] = [expr, val] + [arg for _, arg in binds]
+				elif expr:  # 1 arg special case
+					data[key] = [expr]
+				else:  # 0 args special case
+					data[key] = []
+				break
+			else:
+				data[bind] = expr
+		return Env(self.env, data)
+	
+	def run(self, *args):
+		
+		return self.eval_(self.body, self.bind_args(args))
