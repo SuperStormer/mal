@@ -1,4 +1,4 @@
-from mal_types import Keyword, Symbol, Vector
+from mal_types import Keyword, Symbol, Vector,hash_map
 
 class ReaderError(Exception):
 	pass
@@ -63,6 +63,8 @@ class Reader():
 			return self.read_list(")",list)
 		elif x == "[":
 			return self.read_list("]",Vector)
+		elif x== "{":
+			return self.read_list("}",hash_map)	
 		elif x == "@": #atom deref
 			return self.macro("deref")
 		elif x== "'":
@@ -72,7 +74,12 @@ class Reader():
 		elif x== "~":
 			return self.macro("unquote")
 		elif x== "~@":
-			return self.macro("splice-unquote")					
+			return self.macro("splice-unquote")	
+		elif x== "^":
+			self.pos += 1
+			val = self.read_form()
+			fn = self.read_form()
+			return [Symbol("with-meta"), fn,val]					
 		else:
 			return self.read_atom()
 	def read_list(self,end_char,type_):
@@ -117,7 +124,7 @@ class Reader():
 		return Symbol(x)
 	def macro(self, func: str):
 		self.pos += 1
-		return [Symbol(func), self.read_form()]
+		return [Symbol(func), self.read_form()]	
 	def peek(self):
 		return self.tokens[self.pos]
 	def next(self):

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import itertools
-import env
+from env import Env
 
 @dataclass(frozen=True)
 class Symbol():
@@ -54,11 +54,13 @@ class Function():
 				break
 			else:
 				data[bind] = expr
-		return env.Env(self.env, data)
+		return Env(self.env, data)
 	
 	def __call__(self, *args):
-		
 		return self.eval_(self.body, self.bind_args(args))
+	
+	def copy(self):
+		return Function(self.body, self.params, self.env, self.eval_, self.is_macro)
 
 @dataclass
 class Atom():
@@ -76,9 +78,12 @@ class MalException(Exception):
 	def __str__(self):
 		return str(self.val)
 
-@dataclass
+@dataclass(frozen=True, order=True)
 class Keyword:
 	name: str
 	
 	def __str__(self):
 		return ":" + self.name
+
+def hash_map(lst):
+	return dict(zip(lst[::2], lst[1::2]))
