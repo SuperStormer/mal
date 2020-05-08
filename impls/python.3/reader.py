@@ -64,8 +64,15 @@ class Reader():
 		elif x == "[":
 			return self.read_list("]",Vector)
 		elif x == "@": #atom deref
-			self.pos+=1
-			return [Symbol("deref"), self.read_form()]
+			return self.macro("deref")
+		elif x== "'":
+			return self.macro("quote")
+		elif x== "`":
+			return self.macro("quasiquote")
+		elif x== "~":
+			return self.macro("unquote")
+		elif x== "~@":
+			return self.macro("splice-unquote")					
 		else:
 			return self.read_atom()
 	def read_list(self,end_char,type_):
@@ -106,7 +113,9 @@ class Reader():
 		if x=="nil":
 			return None
 		return Symbol(x)
-
+	def macro(self, func: str):
+		self.pos += 1
+		return [Symbol(func), self.read_form()]
 	def peek(self):
 		return self.tokens[self.pos]
 	def next(self):

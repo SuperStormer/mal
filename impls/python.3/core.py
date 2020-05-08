@@ -2,6 +2,7 @@ import operator
 from pretty_print import pretty_print
 from mal_types import Vector, Atom
 from reader import read_str
+import itertools
 
 def _eq(x, y):
 	if isinstance(x, (list, Vector)) and isinstance(y, (list, Vector)):
@@ -37,6 +38,9 @@ core = {
 	"list?": lambda x: isinstance(x, list),
 	"empty?": lambda lst: len(lst) == 0,
 	"count": lambda x: 0 if x is None else len(x),
+	#sequence
+	"cons": lambda x, seq: [x] + list(seq),
+	"concat": lambda *args: list(itertools.chain.from_iterable(args)),
 	#printing
 	"pr-str": lambda *args: " ".join(pretty_print(x, True) for x in args),
 	"str": lambda *args: "".join(pretty_print(x, False) for x in args),
@@ -46,7 +50,7 @@ core = {
 	"read-string": read_str,
 	"slurp": _slurp,
 	#atoms
-	"atom": lambda x: Atom(x),
+	"atom": Atom,
 	"atom?": lambda x: isinstance(x, Atom),
 	"deref": lambda x: x.val,
 	"reset!": _reset,

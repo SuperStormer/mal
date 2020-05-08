@@ -32,11 +32,12 @@ class Vector():
 		return "Vector(" + repr(self.lst) + ")"
 
 class Function():
-	def __init__(self, body, params, env, eval_):
+	def __init__(self, body, params, env, eval_, is_macro=False):
 		self.body = body
 		self.params = params
 		self.env = env
 		self.eval_ = eval_
+		self.is_macro = is_macro
 	
 	def bind_args(self, args):
 		binds = itertools.zip_longest(self.params, args)
