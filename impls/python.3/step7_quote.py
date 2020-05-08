@@ -15,55 +15,44 @@ def eval_(ast, env):
 	while True:
 		if isinstance(ast, list):
 			if ast:
-				ast = macro_expand(ast, env)
-				if isinstance(ast, list):
-					if ast[0] == Symbol("def!"):
-						val = eval_(ast[2], env)
-						env[ast[1]] = val
-						return val
-					elif ast[0] == Symbol("let*"):
-						env = Env(env)
-						# for loop b/c each def can depend on prev defs
-						for key, value in zip(ast[1][::2], ast[1][1::2]):
-							env[key] = eval_(value, env)
+				if ast[0] == Symbol("def!"):
+					val = eval_(ast[2], env)
+					env[ast[1]] = val
+					return val
+				elif ast[0] == Symbol("let*"):
+					env = Env(env)
+					# for loop b/c each def can depend on prev defs
+					for key, value in zip(ast[1][::2], ast[1][1::2]):
+						env[key] = eval_(value, env)
+					ast = ast[2]
+					continue
+				elif ast[0] == Symbol("if"):
+					result = eval_(ast[1], env)
+					if result is not None and result is not False:  # then
 						ast = ast[2]
+					elif len(ast) >= 4:  # else
+						ast = ast[3]
 						continue
-					elif ast[0] == Symbol("if"):
-						result = eval_(ast[1], env)
-						if result is not None and result is not False:  # then
-							ast = ast[2]
-						elif len(ast) >= 4:  # else
-							ast = ast[3]
-							continue
-						else:  # no else clause
-							return None
-					elif ast[0] == Symbol("fn*"):
-						return Function(ast[2], ast[1], env, eval_)
-					elif ast[0] == Symbol("do"):
-						eval_ast(ast[1:-1], env)
-						ast = ast[-1]
-						continue
-					elif ast[0] == Symbol("quote"):
-						return ast[1]
-					elif ast[0] == Symbol("quasiquote"):
-						ast = quasiquote(ast[1])
-						continue
-					elif ast[0] == Symbol("defmacro!"):
-						val = eval_(ast[2], env)
-						val.is_macro = True
-						env[ast[1]] = val
-						return val
-					elif ast[0] == Symbol("macroexpand"):
-						return macro_expand(ast[1], env)
-					else:
-						fn = eval_(ast[0], env)
-						if isinstance(fn, Function):
-							env = fn.bind_args(eval_ast(ast[1:], env))
-							ast = fn.body
-							continue
-						return fn(*eval_ast(ast[1:], env))
+					else:  # no else clause
+						return None
+				elif ast[0] == Symbol("fn*"):
+					return Function(ast[2], ast[1], env, eval_)
+				elif ast[0] == Symbol("do"):
+					eval_ast(ast[1:-1], env)
+					ast = ast[-1]
+					continue
+				elif ast[0] == Symbol("quote"):
+					return ast[1]
+				elif ast[0] == Symbol("quasiquote"):
+					ast = quasiquote(ast[1])
+					continue
 				else:
-					return eval_ast(ast, env)
+					fn = eval_(ast[0], env)
+					if isinstance(fn, Function):
+						env = fn.bind_args(eval_ast(ast[1:], env))
+						ast = fn.body
+						continue
+					return fn(*eval_ast(ast[1:], env))
 			else:
 				return ast
 		else:
@@ -88,18 +77,6 @@ def quasiquote(ast):
 		return [Symbol("concat"), ast[0][1], quasiquote(ast[1:])]
 	else:
 		return [Symbol("cons"), quasiquote(ast[0]), quasiquote(ast[1:])]
-
-def is_macro_call(ast, env):
-	try:
-		return env[ast[0]].is_macro
-	except (AttributeError, IndexError, KeyError):
-		return False
-
-def macro_expand(ast, env):
-	while is_macro_call(ast, env):
-		macro = env[ast[0]]
-		ast = macro(ast[1:])
-	return ast
 
 def print_(inp: str) -> str:
 	return pretty_print(inp, True)

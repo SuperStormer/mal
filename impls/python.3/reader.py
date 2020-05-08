@@ -1,4 +1,4 @@
-from mal_types import Symbol,Vector
+from mal_types import Keyword, Symbol, Vector
 
 class ReaderError(Exception):
 	pass
@@ -106,6 +106,8 @@ class Reader():
 				else:
 					string += c
 			return string
+		if x[0]==":": #keywords
+			return Keyword(x[1:])
 		if x == "true":
 			return True
 		if x== "false":

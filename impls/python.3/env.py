@@ -17,7 +17,7 @@ class Env():
 			try:
 				return self.outer[key]
 			except TypeError:
-				raise EnvError(f"{key.name!r} not found in environment")
+				raise EnvError(f"{key.name!r} not found")
 	
 	def __setitem__(self, key, value):
 		self.data[key] = value
