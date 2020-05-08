@@ -9,56 +9,63 @@ class Reader():
 		self.pos = 0
 	def tokenize(self, inp: str):
 		tokens = []
-		for line in inp.split("\n"):
-			i = 0
-			
-			while i < len(line):
-				x = line[i]
-				if x.isspace() or x == ",":
-					i += 1
-				elif x == "~" and line[i + 1] == "@":
-					tokens.append("~@")
-					i += 2
-				elif x in "[]{}()'`~^@":
-					tokens.append(x)
-					i += 1
-				elif x == '"': #string
-					i += 1
-					chars = ""
-					escaped = False
-					try:
-						while (x := line[i]) != '"' or escaped:
-							if x == "\\" and not escaped:
-								escaped = True
-							else:
-								escaped = False	
-							chars += x
-							i += 1
-					except IndexError:
-						raise ReaderError("unbalanced double quote")
+		i = 0
+		while i < len(inp):
+			x = inp[i]
+			if x.isspace() or x == ",":
+				i += 1
+			elif x == "~" and inp[i + 1] == "@":
+				tokens.append("~@")
+				i += 2
+			elif x in "[]{}()'`~^@":
+				tokens.append(x)
+				i += 1
+			elif x == '"': #string
+				i += 1
+				chars = ""
+				escaped = False
+				try:
+					while (x := inp[i]) != '"' or escaped:
+						if x == "\\" and not escaped:
+							escaped = True
+						else:
+							escaped = False	
+						chars += x
+						i += 1
+				except IndexError:
+					raise ReaderError("unbalanced double quote")
+				i+=1
+				tokens.append('"' + chars + '"')
+			elif x == ";":
+				try:
 					i+=1
-					tokens.append('"' + chars + '"')
-				elif x == ";":
-					break
-				else: #keywords
-					chars = ""
-					try:
-						while (x := line[i]) not in "[]{}('\"`,;)" and not x.isspace():
-							chars += x
-							i += 1
-					except IndexError:
-						pass		
-					tokens.append(chars)
+					while (x:=inp[i]) != '\n':
+						i+=1
+					i+=1
+				except IndexError:
+					pass	
+			else: #keywords
+				chars = ""
+				try:
+					while (x := inp[i]) not in "[]{}('\"`,;)" and not x.isspace():
+						chars += x
+						i += 1
+				except IndexError:
+					pass		
+				tokens.append(chars)
 		return tokens
 	
 	def read_form(self):
 		if not self.tokens:
 			return None
 		x = self.peek()
-		if x=="(":
+		if x == "(":
 			return self.read_list(")",list)
-		elif x=="[":
+		elif x == "[":
 			return self.read_list("]",Vector)
+		elif x == "@": #atom deref
+			self.pos+=1
+			return [Symbol("deref"), self.read_form()]
 		else:
 			return self.read_atom()
 	def read_list(self,end_char,type_):

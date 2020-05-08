@@ -55,6 +55,14 @@ class Function():
 				data[bind] = expr
 		return Env(self.env, data)
 	
-	def run(self, *args):
+	def __call__(self, *args):
 		
 		return self.eval_(self.body, self.bind_args(args))
+
+@dataclass
+class Atom():
+	def __init__(self, val):
+		self.val = val
+	
+	def __str__(self):
+		return f"(atom {self.val})"

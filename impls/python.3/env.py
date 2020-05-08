@@ -11,6 +11,7 @@ class Env():
 	
 	def __getitem__(self, key):
 		try:
+			
 			return self.data[key]
 		except KeyError:
 			try:
