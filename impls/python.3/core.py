@@ -36,11 +36,14 @@ core = {
 	#lists
 	"list": lambda *args: list(args),
 	"list?": lambda x: isinstance(x, list),
-	"empty?": lambda lst: len(lst) == 0,
-	"count": lambda x: 0 if x is None else len(x),
 	#sequence
+	"empty?": lambda seq: len(seq) == 0,
+	"count": lambda x: 0 if x is None else len(x),
 	"cons": lambda x, seq: [x] + list(seq),
 	"concat": lambda *args: list(itertools.chain.from_iterable(args)),
+	"nth": lambda seq, i: seq[i],
+	"first": lambda seq: None if seq is None or not seq else seq[0],
+	"rest": lambda seq: [] if seq is None or not seq else seq[1:],
 	#printing
 	"pr-str": lambda *args: " ".join(pretty_print(x, True) for x in args),
 	"str": lambda *args: "".join(pretty_print(x, False) for x in args),
