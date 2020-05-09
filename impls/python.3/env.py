@@ -23,7 +23,7 @@ class Env():
 		self.data[key] = value
 	
 	def __contains__(self, value):
-		return value in self.data or value in self.outer
+		return value in self.data or (False if self.outer is None else value in self.outer)
 	
 	def __repr__(self):
 		return f"Env(outer={self.outer!r},data={self.data!r})"

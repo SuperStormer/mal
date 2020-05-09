@@ -64,7 +64,7 @@ core = {
 	"<=": operator.le,
 	">": operator.gt,
 	">=": operator.ge,
-	"not": lambda x: x is None or x is False,
+	#"not": lambda x: x is None or x is False,
 	#sequence
 	"empty?": lambda seq: len(seq) == 0,
 	"count": lambda x: 0 if x is None else len(x),

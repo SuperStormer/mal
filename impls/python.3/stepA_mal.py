@@ -13,6 +13,9 @@ def read(inp: str):
 
 def eval_(ast, env):
 	while True:
+		#if Symbol("el") in env and env[Symbol("el")][1] is None:
+		#	print(ast, env.data[Symbol("el")])
+		
 		if isinstance(ast, list):
 			if ast:
 				ast = macro_expand(ast, env)
@@ -32,6 +35,7 @@ def eval_(ast, env):
 						result = eval_(ast[1], env)
 						if result is not None and result is not False:  # then
 							ast = ast[2]
+							continue
 						elif len(ast) >= 4:  # else
 							ast = ast[3]
 							continue
@@ -70,14 +74,14 @@ def eval_(ast, env):
 								return eval_(ast[2][2], env)
 							except IndexError:  # no catch clause
 								raise e
-					
 					else:
 						fn = eval_(ast[0], env)
 						if isinstance(fn, Function):
 							env = fn.bind_args(eval_ast(ast[1:], env))
 							ast = fn.body
 							continue
-						return fn(*eval_ast(ast[1:], env))
+						else:
+							return fn(*eval_ast(ast[1:], env))
 				else:
 					return eval_ast(ast, env)
 			else:
@@ -130,6 +134,7 @@ global_env = Env(None, {Symbol(k): v for k, v in core.items()})
 global_env[Symbol("eval")] = lambda ast: eval_(ast, global_env)
 global_env[Symbol("*ARGV*")] = sys.argv[2:]
 global_env[Symbol("*host-language*")] = "python.3"
+rep("(def! not (fn* [a] (if a false true)))")
 rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\\nnil)")))))')
 rep(
 	"(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons 'cond (rest (rest xs)))))))"
