@@ -62,7 +62,7 @@ def eval_(ast, env):
 					elif ast[0] == Symbol("try*"):
 						try:
 							return eval_(ast[1], env)
-						except Exception as e:
+						except Exception as e:  # pylint: disable=broad-except
 							try:
 								if ast[2][0] != Symbol("catch*"):
 									raise ValueError("catch* not found")
@@ -153,7 +153,7 @@ def main():
 		except (EOFError, KeyboardInterrupt):
 			print()
 			break
-		except Exception as e:
+		except Exception as e:  # pylint: disable=broad-except
 			print(f"{e.__class__.__name__}: {e}", file=sys.stderr)
 
 if __name__ == "__main__":

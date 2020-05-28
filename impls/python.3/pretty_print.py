@@ -1,14 +1,15 @@
-import mal_types
 import itertools
+
+from mal_types import Symbol, Vector
 
 def pretty_print(obj, print_readably=True):
 	if obj is None:
 		return "nil"
-	elif isinstance(obj, mal_types.Symbol):
+	elif isinstance(obj, Symbol):
 		return obj.name
 	elif isinstance(obj, list):
 		return "(" + " ".join(pretty_print(el, print_readably) for el in obj) + ")"
-	elif isinstance(obj, mal_types.Vector):
+	elif isinstance(obj, Vector):
 		return "[" + " ".join(pretty_print(el, print_readably) for el in obj) + "]"
 	elif isinstance(obj, str):
 		if print_readably:
